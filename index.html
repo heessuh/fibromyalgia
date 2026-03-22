@@ -15,7 +15,7 @@
                             light: '#f3e8ff',
                             DEFAULT: '#9333ea',
                             dark: '#6b21a8',
-                            accent: '#14b8a6' /* Teal for holistic elements */
+                            accent: '#14b8a6'
                         }
                     }
                 }
@@ -23,38 +23,142 @@
         }
     </script>
     <style>
-        /* Aumenta o tamanho base da fonte em ~2 pontos (de 16px para 18px) */
         html { font-size: 18px; }
-        
+
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         .slide { display: none; animation: fadeIn 0.4s ease-in-out; }
         .slide.active { display: flex; }
-        /* Ajuste para garantir que o iframe em tela cheia ocupe todo o espaço corretamente */
         iframe:fullscreen { background-color: white; }
+
+        /* Burger menu drawer */
+        #mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, opacity 0.3s ease;
+            opacity: 0;
+        }
+        #mobile-menu.open {
+            max-height: 400px;
+            opacity: 1;
+        }
+
+        /* Burger icon animation */
+        #burger-btn .bar {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: white;
+            border-radius: 2px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            transform-origin: center;
+        }
+        #burger-btn.is-open .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        #burger-btn.is-open .bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        #burger-btn.is-open .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        /* Mobile tab buttons */
+        .mobile-tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            text-align: left;
+            padding: 14px 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: white;
+            border-radius: 12px;
+            transition: background 0.2s ease;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .mobile-tab-btn:hover { background: rgba(255,255,255,0.18); }
+        .mobile-tab-btn.active-mobile { background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.35); }
+        .mobile-tab-btn.quiz-mobile { background: #581c87; border-color: #a855f7; }
+        .mobile-tab-btn.quiz-mobile:hover { background: #6b21a8; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
     <!-- Header -->
     <header class="bg-gradient-to-r from-fibro-dark to-fibro text-white shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-6">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="flex items-center gap-3 mb-4 md:mb-0">
-                    <i class="fas fa-ribbon text-3xl text-purple-200"></i>
-                    <div>
-                        <h1 class="text-2xl md:text-3xl font-bold">Compreendendo a Fibromialgia</h1>
-                        <p class="text-purple-100 text-sm">Informação Clínica e Cuidado Holístico Integrado</p>
+        <div class="container mx-auto px-4 py-5">
+            <div class="flex items-center justify-between gap-4">
+
+                <!-- Logo / Title -->
+                <div class="flex items-center gap-3 min-w-0">
+                    <i class="fas fa-ribbon text-2xl text-purple-200 shrink-0"></i>
+                    <div class="min-w-0">
+                        <h1 class="text-lg md:text-2xl font-bold leading-tight truncate">Compreendendo a Fibromialgia</h1>
+                        <p class="text-purple-200 text-xs hidden sm:block">Informação Clínica e Cuidado Holístico Integrado</p>
                     </div>
                 </div>
-                <!-- Navigation Tabs -->
-                <nav class="flex flex-wrap justify-center gap-2">
-                    <button onclick="openTab('visao-geral')" id="btn-visao-geral" class="tab-btn bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors backdrop-blur-sm border border-white/10 active-tab">Visão Geral & Diagnóstico</button>
-                    <button onclick="openTab('tratamentos')" id="btn-tratamentos" class="tab-btn bg-transparent hover:bg-white/10 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors border border-transparent">Cuidado & Tratamento</button>
-                    <button onclick="openTab('multimidia')" id="btn-multimidia" class="tab-btn bg-transparent hover:bg-white/10 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors border border-transparent">Apresentação Visual</button>
-                    <button onclick="openTab('quiz')" id="btn-quiz" class="tab-btn bg-purple-900 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md hover:bg-purple-800 transition-colors border border-purple-400">Quiz Interativo</button>
+
+                <!-- Desktop Navigation (md and up) -->
+                <nav class="hidden md:flex flex-wrap justify-end gap-2 shrink-0">
+                    <button onclick="openTab('visao-geral')" id="btn-visao-geral"
+                        class="tab-btn bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors backdrop-blur-sm border border-white/10">
+                        Visão Geral & Diagnóstico
+                    </button>
+                    <button onclick="openTab('tratamentos')" id="btn-tratamentos"
+                        class="tab-btn bg-transparent hover:bg-white/10 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors border border-transparent">
+                        Cuidado & Tratamento
+                    </button>
+                    <button onclick="openTab('multimidia')" id="btn-multimidia"
+                        class="tab-btn bg-transparent hover:bg-white/10 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors border border-transparent">
+                        Apresentação Visual
+                    </button>
+                    <button onclick="openTab('quiz')" id="btn-quiz"
+                        class="tab-btn bg-purple-900 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md hover:bg-purple-800 transition-colors border border-purple-400">
+                        Quiz Interativo
+                    </button>
+                    <button onclick="openTab('contato')" id="btn-contato"
+                        class="tab-btn bg-transparent hover:bg-white/10 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors border border-transparent">
+                        Contato
+                    </button>
+                </nav>
+
+                <!-- Burger Button (mobile only) -->
+                <button id="burger-btn" onclick="toggleMenu()"
+                    class="md:hidden flex flex-col justify-center items-center gap-[5px] w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 transition-colors shrink-0 border border-white/15"
+                    aria-label="Abrir menu" aria-expanded="false">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+            </div>
+
+            <!-- Mobile Dropdown Menu -->
+            <div id="mobile-menu" role="navigation" aria-label="Menu principal">
+                <nav class="flex flex-col gap-2 pt-4 pb-2">
+                    <button onclick="openTab('visao-geral'); closeMenu()" id="mob-btn-visao-geral"
+                        class="mobile-tab-btn active-mobile">
+                        <i class="fas fa-stethoscope w-5 text-center text-purple-200"></i>
+                        Visão Geral & Diagnóstico
+                    </button>
+                    <button onclick="openTab('tratamentos'); closeMenu()" id="mob-btn-tratamentos"
+                        class="mobile-tab-btn">
+                        <i class="fas fa-heartbeat w-5 text-center text-purple-200"></i>
+                        Cuidado & Tratamento
+                    </button>
+                    <button onclick="openTab('multimidia'); closeMenu()" id="mob-btn-multimidia"
+                        class="mobile-tab-btn">
+                        <i class="fas fa-play-circle w-5 text-center text-purple-200"></i>
+                        Apresentação Visual
+                    </button>
+                    <button onclick="openTab('quiz'); closeMenu()" id="mob-btn-quiz"
+                        class="mobile-tab-btn quiz-mobile">
+                        <i class="fas fa-list-check w-5 text-center text-purple-300"></i>
+                        Quiz Interativo
+                    </button>
+                    <button onclick="openTab('contato'); closeMenu()" id="mob-btn-contato"
+                        class="mobile-tab-btn">
+                        <i class="fas fa-envelope w-5 text-center text-purple-200"></i>
+                        Contato
+                    </button>
                 </nav>
             </div>
         </div>
@@ -70,7 +174,6 @@
                 <p class="text-lg text-slate-600 max-w-3xl mx-auto">Um distúrbio neurológico crônico onde o sistema nervoso central sofre <strong>Amplificação Central</strong>, aumentando de forma irregular o "volume" dos sinais de dor. Não é uma doença inflamatória ou autoimune, mas uma disfunção no processamento da dor.</p>
             </div>
 
-            <!-- Tríade de Sintomas -->
             <div class="grid md:grid-cols-3 gap-6 mb-10">
                 <div class="glass-card p-6 rounded-2xl shadow-sm border-t-4 border-t-purple-500 border-slate-200">
                     <div class="text-purple-600 text-3xl mb-3"><i class="fas fa-universal-access"></i></div>
@@ -90,7 +193,6 @@
             </div>
 
             <div class="grid md:grid-cols-2 gap-8">
-                <!-- Diagnóstico e Perfis -->
                 <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
                     <h3 class="text-2xl font-bold mb-4 text-fibro-dark">Diagnóstico (Critérios ACR 2016)</h3>
                     <p class="mb-4 text-slate-700 text-sm">Não há exames de sangue ou Raio-X que identifiquem a fibromialgia. O diagnóstico é clínico e dura pelo menos 3 meses, usando:</p>
@@ -98,7 +200,6 @@
                         <li><i class="fas fa-check text-fibro mr-2"></i> <strong>Índice WPI:</strong> Avalia 19 áreas de dor generalizada.</li>
                         <li><i class="fas fa-check text-fibro mr-2"></i> <strong>Escala SS:</strong> Avalia a gravidade da fadiga, sono e sintomas cognitivos.</li>
                     </ul>
-
                     <h4 class="font-bold text-lg mb-2 text-slate-800 border-b pb-2">Perfis Clínicos Comuns</h4>
                     <ul class="space-y-2 text-sm text-slate-600">
                         <li><strong>Perfil 1:</strong> Sensibilidade extrema à dor (baixo limiar) com ansiedade/depressão moderadas.</li>
@@ -106,16 +207,12 @@
                         <li><strong>Perfil 3:</strong> Dor acompanhada de múltiplas síndromes (Intestino Irritável, enxaquecas), mas humor normal.</li>
                     </ul>
                 </div>
-
-                <!-- Diagnóstico Diferencial -->
                 <div class="bg-gradient-to-br from-purple-50 to-slate-100 p-8 rounded-3xl shadow-sm border border-purple-100">
                     <h3 class="text-2xl font-bold mb-4 text-fibro-dark">Diferenças Importantes</h3>
-                    
                     <div class="mb-5 bg-white p-4 rounded-xl shadow-sm">
                         <h4 class="font-bold text-slate-800 text-sm"><i class="fas fa-bolt text-yellow-500 mr-2"></i> vs. Síndrome da Fadiga Crônica (ME/CFS)</h4>
                         <p class="text-xs text-slate-600 mt-1">Na fibromialgia, a <strong>dor generalizada</strong> é o principal limitante. Na ME/CFS, o marco é o <strong>Mal-Estar Pós-Esforço (PEM)</strong>, onde um esforço mínimo causa uma recidiva física devastadora, tornando exercícios progressivos perigosos para quem tem CFS.</p>
                     </div>
-
                     <div class="bg-white p-4 rounded-xl shadow-sm">
                         <h4 class="font-bold text-slate-800 text-sm"><i class="fas fa-street-view text-blue-500 mr-2"></i> vs. Síndrome Miofascial (MPS)</h4>
                         <p class="text-xs text-slate-600 mt-1">A Fibromialgia é <strong>central</strong> com pontos sensíveis e dor sistêmica. A MPS é <strong>periférica</strong>, restrita a músculos específicos, apresentando "pontos-gatilho" (trigger points) que, ao serem pressionados, irradiam dor (dor referida).</p>
@@ -154,7 +251,6 @@
             </div>
 
             <div class="grid md:grid-cols-2 gap-8 mb-8">
-                <!-- Abordagem Médica -->
                 <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
                     <div class="flex items-center gap-3 mb-4 text-fibro-dark">
                         <i class="fas fa-capsules text-2xl"></i>
@@ -168,8 +264,6 @@
                         <li><strong><i class="fas fa-check text-green-500 mr-2"></i> Tratamentos Emergentes:</strong> O uso de LDN (Naltrexona em Baixa Dose), Cannabis Medicinal e Estimulação Magnética Transcraniana (TMS) estão sendo estudados para modular células da glia e inflamação central.</li>
                     </ul>
                 </div>
-
-                <!-- Abordagem Holística -->
                 <div class="bg-gradient-to-br from-teal-50 to-green-50 p-8 rounded-3xl shadow-sm border border-teal-100">
                     <div class="flex items-center gap-3 mb-4 text-teal-700">
                         <i class="fas fa-leaf text-2xl"></i>
@@ -184,7 +278,6 @@
                 </div>
             </div>
 
-            <!-- Estilo de vida / Pacing -->
             <div class="bg-yellow-50 p-8 rounded-3xl shadow-sm border border-yellow-200">
                 <div class="flex items-start gap-4">
                     <div class="text-yellow-600 text-4xl mt-1"><i class="fas fa-spoon"></i></div>
@@ -197,27 +290,24 @@
             </div>
         </section>
 
-        <!-- TAB: Multimídia (Slide Deck Interativo) -->
+        <!-- TAB: Multimídia -->
         <section id="multimidia" class="tab-content">
             <div class="text-center mb-6">
                 <h2 class="text-3xl font-bold text-slate-800">Apresentação & Multimídia</h2>
                 <p class="text-slate-600 mt-2">Navegue pelo nosso guia educacional e assista às explicações visuais.</p>
             </div>
 
-            <!-- Slide Deck PDF Embed -->
             <div id="pdf-container" class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden relative mb-8 transition-all duration-300">
                 <div class="bg-slate-100 p-4 border-b border-slate-200 flex flex-col md:flex-row gap-4 items-center justify-between">
                     <h3 class="font-bold text-slate-700"><i class="fas fa-file-pdf text-red-500 mr-2"></i> Guia Visual: Desmistificando a Fibromialgia</h3>
                     <div class="flex gap-2">
-                        <!-- Botão de Ampliar/Minimizar -->
                         <button id="btn-resize-pdf" onclick="togglePdfSize()" class="text-sm bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-full transition-colors font-medium shadow-sm flex items-center" title="Ampliar">
                             <i class="fas fa-expand mr-2"></i> Ampliar
                         </button>
                     </div>
                 </div>
-                <!-- Aspect Ratio Container for PDF -->
                 <div id="pdf-wrapper" class="aspect-[16/9] w-full bg-slate-200 relative transition-all duration-300">
-                    <iframe id="pdf-frame" src="https://drive.google.com/file/d/1KNiNEFNN38vCCI-Y-JDsFnhDwc1Fyto-/preview" class="absolute inset-0 w-full h-full border-0" title="Apresentação sobre Fibromialgia" allowfullscreen>
+                    <iframe id="pdf-frame" src="https://drive.google.com/file/d/1KNiNEFNN38vCCI-Y-JDsFnhDwc1Fyto-/preview" class="absolute inset-0 w-full h-full border-0" title="Apresentação sobre Fibromialgia" allowfullscreen sandbox="allow-scripts allow-same-origin allow-presentation">
                         <p class="text-center py-20 text-slate-500">
                             Seu navegador não suporta a visualização de PDFs diretamente. <br><br>
                             <a href="https://drive.google.com/file/d/1KNiNEFNN38vCCI-Y-JDsFnhDwc1Fyto-/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="bg-fibro text-white px-6 py-2 rounded-full mt-4 inline-block font-bold shadow hover:bg-fibro-dark transition-colors">Clique aqui para acessar o PDF</a>
@@ -228,46 +318,40 @@
                     <i class="fas fa-cloud text-blue-500 mr-1"></i> Apresentação hospedada e servida com segurança pelo Google Drive.
                 </div>
             </div>
-            
-            <!-- YouTube Video Embed -->
+
             <div class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                 <div class="flex items-center gap-2 mb-4">
                     <i class="fab fa-youtube text-red-600 text-2xl"></i>
                     <h3 class="font-bold text-slate-800">A Ciência da Sensibilização Central</h3>
                 </div>
-                
                 <div class="aspect-video w-full rounded-lg overflow-hidden shadow-inner bg-slate-900 relative">
-                    <iframe 
+                    <iframe
                         class="absolute inset-0 w-full h-full"
-                        src="https://www.youtube.com/embed/HefuJFcjBSA" 
-                        title="A Ciência da Sensibilização Central" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                        allowfullscreen>
+                        src="https://www.youtube.com/embed/HefuJFcjBSA"
+                        title="A Ciência da Sensibilização Central"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen
+                        sandbox="allow-scripts allow-same-origin allow-presentation allow-popups">
                     </iframe>
                 </div>
                 <p class="text-sm text-slate-600 mt-4 text-center">Assista ao vídeo para aprofundar seu conhecimento sobre como o sistema nervoso processa a dor.</p>
             </div>
-
         </section>
 
         <!-- TAB: Quiz Interativo -->
         <section id="quiz" class="tab-content">
             <div class="bg-white rounded-3xl shadow-lg border border-slate-200 overflow-hidden max-w-4xl mx-auto">
-                <!-- Quiz Header -->
                 <div class="bg-fibro text-white p-6 md:p-8 text-center relative">
                     <h2 class="text-3xl font-bold mb-2">Teste Seus Conhecimentos</h2>
                     <p class="text-purple-100">Avaliação educacional sobre causas, diagnóstico clínico e tratamentos.</p>
-                    
                     <div class="mt-6 bg-purple-900/50 h-2 rounded-full overflow-hidden">
                         <div id="quiz-progress" class="bg-green-400 h-full transition-all duration-300" style="width: 0%"></div>
                     </div>
                     <p class="text-xs text-purple-200 mt-2 text-right">Pergunta <span id="current-question-num">1</span> de 10</p>
                 </div>
 
-                <!-- Quiz Body -->
                 <div class="p-6 md:p-8">
-                    <!-- Intro Screen -->
                     <div id="quiz-intro" class="text-center py-8">
                         <div class="w-20 h-20 bg-purple-100 text-fibro rounded-full flex items-center justify-center text-4xl mx-auto mb-4">
                             <i class="fas fa-list-check"></i>
@@ -277,15 +361,11 @@
                         <button onclick="startQuiz()" class="bg-fibro hover:bg-fibro-dark text-white font-bold py-3 px-8 rounded-full transition-colors text-lg shadow-md">Iniciar Avaliação</button>
                     </div>
 
-                    <!-- Question Container -->
                     <div id="question-container" class="hidden">
                         <h3 id="question-text" class="text-xl md:text-2xl font-bold text-slate-800 mb-6"></h3>
-                        <div id="options-container" class="space-y-3">
-                            <!-- Options injected by JS -->
-                        </div>
+                        <div id="options-container" class="space-y-3"></div>
                     </div>
 
-                    <!-- Explanation Container -->
                     <div id="explanation-container" class="hidden mt-6 p-5 rounded-xl border">
                         <div class="flex items-start gap-3">
                             <div id="feedback-icon" class="text-2xl mt-1"></div>
@@ -297,7 +377,6 @@
                         <button onclick="nextQuestion()" class="mt-4 w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl transition-colors">Avançar <i class="fas fa-arrow-right ml-2"></i></button>
                     </div>
 
-                    <!-- Results Screen -->
                     <div id="quiz-results" class="hidden text-center py-8">
                         <div id="result-icon" class="w-24 h-24 rounded-full flex items-center justify-center text-5xl mx-auto mb-4"></div>
                         <h3 class="text-3xl font-bold text-slate-800 mb-2">Avaliação Concluída!</h3>
@@ -311,58 +390,106 @@
 
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 py-8 mt-12">
-        <div class="container mx-auto px-4 text-center">
-            <p class="mb-2"><i class="fas fa-info-circle mr-1"></i> <strong>Aviso Médico:</strong> Conteúdo extraído de diretrizes clínicas e literatura médica (ACR, NIAMS, Harvard Health). Não substitui diagnóstico profissional.</p>
-            <p class="text-sm mt-4">Portal Educacional da Fibromialgia | 2026</p>
-        </div>
-    </footer>
+        <!-- TAB: Contato -->
+        <section id="contato" class="tab-content">
+            <div class="max-w-xl mx-auto py-12 px-4 text-center">
+                <div class="w-20 h-20 bg-purple-100 text-fibro rounded-full flex items-center justify-center text-4xl mx-auto mb-6">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">Contato</h2>
+                <p class="text-lg text-slate-600 mb-8">Por favor, mandar duvidas e comentarios:</p>
+                <a href="mailto:maricampese17@gmail.com"
+                   class="inline-flex items-center gap-3 bg-gradient-to-r from-fibro-dark to-fibro text-white font-semibold px-8 py-4 rounded-2xl shadow-md hover:shadow-lg hover:opacity-90 transition-all text-lg">
+                    <i class="fas fa-paper-plane"></i>
+                    maricampese17@gmail.com
+                </a>
+            </div>
+        </section>
 
-    <!-- JavaScript -->
+    <!-- Footer removed -->
+
     <script>
-        // === TABS LOGIC ===
-        function openTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('bg-white/20', 'border-white/10', 'text-white');
-                if(btn.id !== 'btn-quiz') btn.classList.add('bg-transparent', 'border-transparent');
-            });
-            document.getElementById(tabId).classList.add('active');
-            const activeBtn = document.getElementById('btn-' + tabId);
-            if(tabId !== 'quiz') {
-                activeBtn.classList.remove('bg-transparent', 'border-transparent');
-                activeBtn.classList.add('bg-white/20', 'border-white/10', 'text-white');
-            }
+        // ============================================================
+        // BURGER MENU
+        // ============================================================
+        let menuOpen = false;
+
+        function toggleMenu() {
+            menuOpen = !menuOpen;
+            const menu = document.getElementById('mobile-menu');
+            const btn = document.getElementById('burger-btn');
+            menu.classList.toggle('open', menuOpen);
+            btn.classList.toggle('is-open', menuOpen);
+            btn.setAttribute('aria-expanded', menuOpen);
         }
 
-        // === PDF ENLARGE LOGIC ===
+        function closeMenu() {
+            menuOpen = false;
+            document.getElementById('mobile-menu').classList.remove('open');
+            document.getElementById('burger-btn').classList.remove('is-open');
+            document.getElementById('burger-btn').setAttribute('aria-expanded', false);
+        }
+
+        // Close menu when clicking outside the header
+        document.addEventListener('click', function(e) {
+            const header = document.querySelector('header');
+            if (menuOpen && !header.contains(e.target)) closeMenu();
+        });
+
+        // ============================================================
+        // TABS
+        // ============================================================
+        const tabIds = ['visao-geral', 'tratamentos', 'multimidia', 'quiz'];
+
+        function openTab(tabId) {
+            // Hide all content sections
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+
+            // Desktop buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-white/20', 'border-white/10');
+                if (btn.id !== 'btn-quiz') {
+                    btn.classList.add('bg-transparent', 'border-transparent');
+                }
+            });
+            const activeDesktopBtn = document.getElementById('btn-' + tabId);
+            if (activeDesktopBtn && tabId !== 'quiz') {
+                activeDesktopBtn.classList.remove('bg-transparent', 'border-transparent');
+                activeDesktopBtn.classList.add('bg-white/20', 'border-white/10');
+            }
+
+            // Mobile buttons — highlight active
+            document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
+                btn.classList.remove('active-mobile');
+            });
+            const activeMobileBtn = document.getElementById('mob-btn-' + tabId);
+            if (activeMobileBtn) activeMobileBtn.classList.add('active-mobile');
+        }
+
+        // ============================================================
+        // PDF ENLARGE
+        // ============================================================
         let isPdfExpanded = false;
         function togglePdfSize() {
             const container = document.getElementById('pdf-container');
             const wrapper = document.getElementById('pdf-wrapper');
             const btn = document.getElementById('btn-resize-pdf');
-
             isPdfExpanded = !isPdfExpanded;
-
             if (isPdfExpanded) {
-                // Ampliar (Modal mode)
                 container.classList.remove('max-w-4xl', 'mx-auto', 'mb-8', 'relative');
                 container.classList.add('fixed', 'inset-2', 'md:inset-8', 'z-[100]', 'shadow-2xl', 'flex', 'flex-col');
                 wrapper.classList.remove('aspect-[16/9]');
-                wrapper.classList.add('flex-grow'); // Preenche o resto da tela
+                wrapper.classList.add('flex-grow');
                 btn.innerHTML = '<i class="fas fa-compress mr-2"></i> Minimizar';
                 btn.classList.replace('bg-slate-800', 'bg-red-600');
                 btn.classList.replace('hover:bg-slate-900', 'hover:bg-red-700');
-
-                // Adicionar fundo escuro
                 let backdrop = document.createElement('div');
                 backdrop.id = 'pdf-backdrop';
                 backdrop.className = 'fixed inset-0 bg-black/80 z-[90] backdrop-blur-sm';
                 document.body.appendChild(backdrop);
-                document.body.style.overflow = 'hidden'; // Evita que a página role atrás do PDF
+                document.body.style.overflow = 'hidden';
             } else {
-                // Minimizar (Normal mode)
                 container.classList.add('max-w-4xl', 'mx-auto', 'mb-8', 'relative');
                 container.classList.remove('fixed', 'inset-2', 'md:inset-8', 'z-[100]', 'shadow-2xl', 'flex', 'flex-col');
                 wrapper.classList.add('aspect-[16/9]');
@@ -370,123 +497,73 @@
                 btn.innerHTML = '<i class="fas fa-expand mr-2"></i> Ampliar';
                 btn.classList.replace('bg-red-600', 'bg-slate-800');
                 btn.classList.replace('hover:bg-red-700', 'hover:bg-slate-900');
-
-                // Remover fundo escuro
                 const backdrop = document.getElementById('pdf-backdrop');
-                if(backdrop) backdrop.remove();
+                if (backdrop) backdrop.remove();
                 document.body.style.overflow = 'auto';
             }
         }
 
-        // === QUIZ DATA (From Uploaded Docs) ===
+        // ============================================================
+        // QUIZ
+        // ============================================================
         const quizData = [
             {
                 question: "Qual é a tríade clínica de sintomas que caracteriza a fibromialgia?",
-                options: [
-                    "Febre alta, dor articular com inchaço, e perda de peso.",
-                    "Dor generalizada sistêmica, fadiga extrema e disfunção cognitiva (Fibro Fog).",
-                    "Apenas fadiga crônica isolada após esforços leves.",
-                    "Dor restrita à coluna cervical e dores de cabeça tensionais."
-                ],
+                options: ["Febre alta, dor articular com inchaço, e perda de peso.", "Dor generalizada sistêmica, fadiga extrema e disfunção cognitiva (Fibro Fog).", "Apenas fadiga crônica isolada após esforços leves.", "Dor restrita à coluna cervical e dores de cabeça tensionais."],
                 correctIndex: 1,
                 explanation: "Os documentos descrevem a tríade como dor constante acima e abaixo da cintura (dor generalizada), sono não reparador causando fadiga severa, e névoa mental (fibro fog) que afeta foco e memória."
             },
             {
                 question: "O que a teoria da 'Sensibilização Central' propõe sobre a origem da dor na fibromialgia?",
-                options: [
-                    "A dor é causada por lesões inflamatórias severas no tecido muscular periférico.",
-                    "Ocorre uma alteração no cérebro e medula espinhal que amplifica os sinais, tornando os nervos hiper-reativos à dor.",
-                    "É um processo puramente psicológico sem alterações físicas nos neurotransmissores.",
-                    "A dor é causada por uma resposta autoimune que ataca o tecido cartilaginoso."
-                ],
+                options: ["A dor é causada por lesões inflamatórias severas no tecido muscular periférico.", "Ocorre uma alteração no cérebro e medula espinhal que amplifica os sinais, tornando os nervos hiper-reativos à dor.", "É um processo puramente psicológico sem alterações físicas nos neurotransmissores.", "A dor é causada por uma resposta autoimune que ataca o tecido cartilaginoso."],
                 correctIndex: 1,
                 explanation: "A Sensibilização (ou Amplificação) Central ajusta o 'volume' da dor no nível máximo. O cérebro processa sinais normais de forma anormal, causando dor ao toque ou pressão leve devido a desequilíbrios na serotonina e norepinefrina."
             },
             {
                 question: "Como o diagnóstico clínico da fibromialgia é realizado atualmente, conforme os critérios do ACR?",
-                options: [
-                    "Exclusivamente através de exames de sangue para identificar marcadores inflamatórios e autoimunes.",
-                    "Através de Raios-X ou ressonância magnética que demonstrem desgaste ósseo.",
-                    "Usando o Índice de Dor Generalizada (WPI) e a Escala de Gravidade dos Sintomas (SS) presentes por pelo menos 3 meses.",
-                    "Apenas através do diagnóstico psiquiátrico para exclusão de depressão."
-                ],
+                options: ["Exclusivamente através de exames de sangue para identificar marcadores inflamatórios e autoimunes.", "Através de Raios-X ou ressonância magnética que demonstrem desgaste ósseo.", "Usando o Índice de Dor Generalizada (WPI) e a Escala de Gravidade dos Sintomas (SS) presentes por pelo menos 3 meses.", "Apenas através do diagnóstico psiquiátrico para exclusão de depressão."],
                 correctIndex: 2,
                 explanation: "Não existem exames de laboratório ou imagem para fibromialgia. O diagnóstico é clínico (ACR 2016), requerendo escores específicos no WPI e SS por 3 meses."
             },
             {
                 question: "Qual é a principal diferença clínica entre a Fibromialgia e a Síndrome da Dor Miofascial (MPS)?",
-                options: [
-                    "Ambas são idênticas e tratadas com os mesmos medicamentos anti-inflamatórios.",
-                    "A fibromialgia é um problema do sistema nervoso central com dor generalizada; a MPS é periférica com dor restrita e 'pontos-gatilho' musculares.",
-                    "A MPS causa a névoa mental profunda (Fibro fog), enquanto a fibromialgia afeta apenas os músculos.",
-                    "A Fibromialgia causa febre constante, ao contrário da MPS."
-                ],
+                options: ["Ambas são idênticas e tratadas com os mesmos medicamentos anti-inflamatórios.", "A fibromialgia é um problema do sistema nervoso central com dor generalizada; a MPS é periférica com dor restrita e 'pontos-gatilho' musculares.", "A MPS causa a névoa mental profunda (Fibro fog), enquanto a fibromialgia afeta apenas os músculos.", "A Fibromialgia causa febre constante, ao contrário da MPS."],
                 correctIndex: 1,
                 explanation: "A Síndrome Miofascial é restrita e localizada, marcada por 'trigger points' (pontos-gatilho) que irradiam a dor. A Fibromialgia é sistêmica, central e apresenta 'tender points' que doem apenas onde tocados."
             },
             {
                 question: "A Fibromialgia costuma ser confundida com a Síndrome da Fadiga Crônica (ME/CFS). Qual sintoma é a marca registrada exclusiva da ME/CFS?",
-                options: [
-                    "Dor articular severa acompanhada de inchaço visível.",
-                    "Mal-Estar Pós-Esforço (PEM) - um colapso e piora profunda após mínimo esforço físico ou mental.",
-                    "Insônia profunda e acordar constantemente cansado.",
-                    "A presença de inflamação elevada revelada no exame de PCR no sangue."
-                ],
+                options: ["Dor articular severa acompanhada de inchaço visível.", "Mal-Estar Pós-Esforço (PEM) - um colapso e piora profunda após mínimo esforço físico ou mental.", "Insônia profunda e acordar constantemente cansado.", "A presença de inflamação elevada revelada no exame de PCR no sangue."],
                 correctIndex: 1,
                 explanation: "Embora ambas compartilhem fadiga extrema, a ME/CFS é caracterizada pelo PEM (Post-Exertional Malaise). Por causa do PEM, terapias de exercícios progressivos, que são ótimas para fibromialgia, podem ser devastadoras para pacientes com CFS."
             },
             {
                 question: "Segundo as fontes médicas, quais os 3 medicamentos especificamente aprovados pela FDA para o tratamento da fibromialgia?",
-                options: [
-                    "Ibuprofeno, Naproxeno e Aspirina.",
-                    "Zolpidem (Ambien), Morfina e Codeína.",
-                    "Duloxetina (Cymbalta), Milnaciprano (Savella) e Pregabalina (Lyrica).",
-                    "Gabapentina, Ciclobenzaprina e Paracetamol."
-                ],
+                options: ["Ibuprofeno, Naproxeno e Aspirina.", "Zolpidem (Ambien), Morfina e Codeína.", "Duloxetina (Cymbalta), Milnaciprano (Savella) e Pregabalina (Lyrica).", "Gabapentina, Ciclobenzaprina e Paracetamol."],
                 correctIndex: 2,
                 explanation: "Duloxetina e Milnaciprano são SNRIs que atuam na modulação de químicos cerebrais. A Pregabalina é um anticonvulsivante que bloqueia nervos hiperativos na transmissão da dor."
             },
             {
                 question: "Quais medicações as diretrizes clínicas desaconselham fortemente, pois são ineficazes para sensibilização central e podem causar hiperalgesia?",
-                options: [
-                    "Analgésicos Analgésicos Opioides.",
-                    "Antidepressivos Tricíclicos de baixa dose.",
-                    "Relaxantes Musculares.",
-                    "Suplementos de Vitamina D."
-                ],
+                options: ["Analgésicos Opioides.", "Antidepressivos Tricíclicos de baixa dose.", "Relaxantes Musculares.", "Suplementos de Vitamina D."],
                 correctIndex: 0,
                 explanation: "O uso de opioides não é recomendado. Eles não tratam a raiz do processamento da dor no cérebro (sensibilização central) e o uso contínuo pode induzir a hiperalgesia (aumento perigoso na sensibilidade à dor)."
             },
             {
                 question: "Para o controle não-farmacológico, o que o conceito de 'Pacing' (associado à Teoria da Colher) ensina ao paciente?",
-                options: [
-                    "Que se deve fazer atividades intensas independentemente da dor para fortalecer o músculo.",
-                    "Uma estratégia comportamental para equilibrar atividade e descanso, evitando o ciclo de colapso 'Push-Crash'.",
-                    "A focar apenas em terapias com uso de agulhas e massagem profunda nas áreas doloridas.",
-                    "Uma dieta restrita sem consumo de carboidratos."
-                ],
+                options: ["Que se deve fazer atividades intensas independentemente da dor para fortalecer o músculo.", "Uma estratégia comportamental para equilibrar atividade e descanso, evitando o ciclo de colapso 'Push-Crash'.", "A focar apenas em terapias com uso de agulhas e massagem profunda nas áreas doloridas.", "Uma dieta restrita sem consumo de carboidratos."],
                 correctIndex: 1,
                 explanation: "O Pacing é a gestão de energia vital. A Teoria da Colher ajuda os pacientes a entenderem que têm energia limitada diariamente e precisam planejar intervalos de descanso para não entrarem em crise profunda de dor."
             },
             {
                 question: "Ao classificar os perfis clínicos, o que caracteriza o 'Perfil 2' de pacientes com fibromialgia?",
-                options: [
-                    "Baixa sensibilidade à dor e foco puramente em problemas inflamatórios periféricos.",
-                    "Níveis extremamente normais de humor acompanhados apenas por intestino irritável.",
-                    "Dor generalizada acompanhada de altos níveis de depressão severa, ansiedade crônica e estresse.",
-                    "Fibromialgia desencadeada exclusivamente por Lúpus."
-                ],
+                options: ["Baixa sensibilidade à dor e foco puramente em problemas inflamatórios periféricos.", "Níveis extremamente normais de humor acompanhados apenas por intestino irritável.", "Dor generalizada acompanhada de altos níveis de depressão severa, ansiedade crônica e estresse.", "Fibromialgia desencadeada exclusivamente por Lúpus."],
                 correctIndex: 2,
                 explanation: "O Perfil 2 identifica pacientes cuja fibromialgia está fortemente sobreposta a comorbidades psicológicas altas (como depressão e estresse profundo), exigindo maior foco em Terapia Cognitivo-Comportamental."
             },
             {
                 question: "Sobre terapias holísticas como Yoga, Tai Chi e Qigong, como os documentos as classificam no cuidado da fibromialgia?",
-                options: [
-                    "Como substitutos completos e garantidos para as medicações aprovadas pela FDA.",
-                    "Como 'práticas de movimento meditativo' que combinam exercício sem impacto, foco na respiração e relaxamento para reduzir estresse e dor.",
-                    "Devem ser evitadas, pois o alongamento piora os pontos sensíveis.",
-                    "Servem apenas como métodos para queimar calorias e perder peso em pacientes obesos."
-                ],
+                options: ["Como substitutos completos e garantidos para as medicações aprovadas pela FDA.", "Como 'práticas de movimento meditativo' que combinam exercício sem impacto, foco na respiração e relaxamento para reduzir estresse e dor.", "Devem ser evitadas, pois o alongamento piora os pontos sensíveis.", "Servem apenas como métodos para queimar calorias e perder peso em pacientes obesos."],
                 correctIndex: 1,
                 explanation: "O movimento meditativo (como Tai Chi e Yoga) é altamente recomendado. Eles acalmam o sistema nervoso autônomo e mantêm o paciente fisicamente móvel sem induzir o ciclo de dor intensa do exercício de alto impacto."
             }
@@ -508,18 +585,15 @@
             hasAnswered = false;
             document.getElementById('explanation-container').classList.add('hidden');
             document.getElementById('options-container').innerHTML = '';
-            
-            const progress = ((currentQuestion) / quizData.length) * 100;
+            const progress = (currentQuestion / quizData.length) * 100;
             document.getElementById('quiz-progress').style.width = `${progress}%`;
             document.getElementById('current-question-num').innerText = currentQuestion + 1;
-
             const qData = quizData[currentQuestion];
             document.getElementById('question-text').innerText = qData.question;
-
             qData.options.forEach((option, index) => {
                 const btn = document.createElement('button');
                 btn.className = 'w-full text-left p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-fibro hover:bg-fibro-light transition-all text-slate-700 font-medium option-btn';
-                btn.innerHTML = `<span class="inline-block w-8 h-8 text-center leading-8 rounded-full bg-slate-100 mr-3 text-slate-500 font-bold">${['A', 'B', 'C', 'D'][index]}</span> ${option}`;
+                btn.innerHTML = `<span class="inline-block w-8 h-8 text-center leading-8 rounded-full bg-slate-100 mr-3 text-slate-500 font-bold">${['A','B','C','D'][index]}</span> ${option}`;
                 btn.onclick = () => checkAnswer(index, btn);
                 document.getElementById('options-container').appendChild(btn);
             });
@@ -528,13 +602,10 @@
         function checkAnswer(selectedIndex, btnElement) {
             if (hasAnswered) return;
             hasAnswered = true;
-
             const qData = quizData[currentQuestion];
             const isCorrect = selectedIndex === qData.correctIndex;
             const allBtns = document.querySelectorAll('.option-btn');
-
             allBtns.forEach(btn => btn.style.pointerEvents = 'none');
-
             if (isCorrect) {
                 score++;
                 btnElement.classList.replace('border-slate-200', 'border-green-500');
@@ -553,9 +624,7 @@
             const container = document.getElementById('explanation-container');
             const icon = document.getElementById('feedback-icon');
             const title = document.getElementById('feedback-title');
-            
             container.classList.remove('hidden', 'bg-green-50', 'border-green-200', 'bg-red-50', 'border-red-200');
-            
             if (isCorrect) {
                 container.classList.add('bg-green-50', 'border-green-200');
                 icon.innerHTML = '<i class="fas fa-check-circle text-green-600"></i>';
@@ -567,7 +636,6 @@
                 title.innerText = 'Incorreto';
                 title.className = 'font-bold text-lg mb-1 text-red-800';
             }
-
             document.getElementById('explanation-text').innerText = text;
         }
 
@@ -579,9 +647,8 @@
                 document.getElementById('question-container').classList.add('hidden');
                 document.getElementById('explanation-container').classList.add('hidden');
                 document.getElementById('quiz-results').classList.remove('hidden');
-                document.getElementById('quiz-progress').style.width = `100%`;
+                document.getElementById('quiz-progress').style.width = '100%';
                 document.getElementById('score-text').innerText = score;
-
                 const iconArea = document.getElementById('result-icon');
                 const msg = document.getElementById('result-message');
                 if (score >= 8) {
